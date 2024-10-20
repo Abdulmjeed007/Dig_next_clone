@@ -259,7 +259,6 @@ model Certificate {
   userId         String?
   courseTitle    String
   dateOfIssuance DateTime @default(now())
-  createdAt      DateTime @default(now())
 
   @@index([examId])
 }
