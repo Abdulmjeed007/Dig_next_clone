@@ -1,32 +1,22 @@
-import { auth } from "@clerk/nextjs/server";
-import { redirect } from "next/navigation";
-
-import { db } from "@/lib/db";
+"use client";
 
 import { DataTable } from "./_components/data-table";
 import { columns } from "./_components/columns";
+import { useEffect } from "react";
+import useCoursesStore from "@/store/coursesStore";
 
-const CoursesPage = async () => {
-  const { userId } = auth();
+const CoursesPage = () => {
+  const { courses, fetchItems, loading } = useCoursesStore();
 
-  if (!userId) {
-    return redirect("/");
-  }
+  useEffect(() => {
+    fetchItems();
+  }, [fetchItems]);
 
-  const courses = await db.course.findMany({
-    where: {
-      userId,
-    },
-    orderBy: {
-      createdAt: "desc",
-    },
-  });
-
-  return ( 
+  return (
     <div className="p-6">
-      <DataTable columns={columns} data={courses} />
+      <DataTable columns={columns} data={courses} isLoading={loading} />
     </div>
-   );
-}
- 
+  );
+};
+
 export default CoursesPage;

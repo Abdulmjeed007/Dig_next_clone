@@ -13,7 +13,7 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import Link from "next/link";
-import { PlusCircle } from "lucide-react";
+import { Loader2, PlusCircle } from "lucide-react";
 
 import {
   Table,
@@ -29,11 +29,13 @@ import { Input } from "@/components/ui/input";
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
+  isLoading?: boolean;
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
+  isLoading,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -56,7 +58,7 @@ export function DataTable<TData, TValue>({
   });
 
   return (
-    <div>
+    <div className="relative">
       <div className="flex items-center py-4 justify-end space-x-4">
         <Input
           placeholder="...تصفية الدورات"
@@ -123,6 +125,11 @@ export function DataTable<TData, TValue>({
           </TableBody>
         </Table>
       </div>
+      {isLoading && (
+        <div className="absolute bottom-0 left-0 right-0 top-0 flex items-center justify-center w-full h-full bg-white/80">
+          <Loader2 className="h-10 w-10 animate-spin" />
+        </div>
+      )}
       <div className="flex items-center justify-end space-x-2 py-4">
         <Button
           variant="outline"
