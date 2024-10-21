@@ -37,22 +37,21 @@ export const getProgress = async (
     const exams = await db.exam.findMany({
       where: {
         courseId,
-        isPublished: true
-      }
-    })
-    const examsIds = exams.map((exam) => exam.id)
+        isPublished: true,
+      },
+    });
+    const examsIds = exams.map((exam) => exam.id);
     const examsCompeleted = await db.userProgress.count({
-      where:{
+      where: {
         userId,
         lessonId: {
-          in:examsIds
-        }
-      }
-    })
+          in: examsIds,
+        },
+      },
+    });
     const publishedQuizIds = publishedChapters.filter(
-      chapter => chapter.quiz?.userId != 'nil' && chapter.quiz != null
-    )
-    console.log(publishedQuizIds)
+      (chapter) => chapter.quiz?.userId != "nil" && chapter.quiz != null
+    );
 
     const validCompletedLessons = await db.userProgress.count({
       where: {
@@ -76,12 +75,12 @@ export const getProgress = async (
         },
       },
     });
-    const examsProgress = examsCompeleted * 10
+    const examsProgress = examsCompeleted * 10;
     const completedItems = validCompletedLessons + validCompletedQuizes;
     const totalItems = publishedLessonIds.length + publishedQuizIds.length;
-    const progressPercentage = (completedItems / totalItems) * (100 - exams.length * 10) + examsProgress;
-    console.log(progressPercentage + " %")
-    
+    const progressPercentage =
+      (completedItems / totalItems) * (100 - exams.length * 10) + examsProgress;
+
     return progressPercentage;
   } catch (error) {
     console.log("[GET_PROGRESS]", error);

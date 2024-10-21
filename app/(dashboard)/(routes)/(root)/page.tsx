@@ -2,12 +2,10 @@ import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { CheckCircle, Clock } from "lucide-react";
 
-import { getDashboardCourses } from "@/actions/get-dashboard-courses";
 import { CoursesList } from "@/components/courses-list";
 
 import { InfoCard } from "./_components/info-card";
 import { getCourses } from "@/actions/get-courses";
-import { env } from "process";
 import { DialogBox } from "../../_components/dialogueBox";
 
 export default async function Dashboard() {
@@ -17,13 +15,18 @@ export default async function Dashboard() {
     return redirect("/");
   }
 
-
-  const introductionCourseId = process.env.NEXT_PUBLIC_INTRODUTION_COURSE_ID
-  const coursesNot = await getCourses({ userId })
-  const courses: any = coursesNot.filter((e) => e.id != introductionCourseId)
-  const coursesInProgress = courses.filter((courses: any) => courses.progress > 0 && courses.progress < 100)
-  const completedCourses = courses.filter((courses: any) => courses.progress > 0 && courses.progress == 100)
-  const coursesNotStartedYet = courses.filter((courses: any) => courses.progress == 0)
+  const introductionCourseId = process.env.NEXT_PUBLIC_INTRODUTION_COURSE_ID;
+  const coursesNot = await getCourses({ userId });
+  const courses: any = coursesNot.filter((e) => e.id != introductionCourseId);
+  const coursesInProgress = courses.filter(
+    (courses: any) => courses.progress > 0 && courses.progress < 100
+  );
+  const completedCourses = courses.filter(
+    (courses: any) => courses.progress > 0 && courses.progress == 100
+  );
+  const coursesNotStartedYet = courses.filter(
+    (courses: any) => courses.progress == 0
+  );
   return (
     <div>
       <DialogBox page="coursesPage" />
@@ -37,13 +40,18 @@ export default async function Dashboard() {
           />
           <InfoCard
             icon={CheckCircle}
-
             label="مكتمل"
             numberOfItems={completedCourses.length}
             variant="success"
           />
         </div>
-        <CoursesList items={[...completedCourses, ...coursesInProgress, ...coursesNotStartedYet]} />
+        <CoursesList
+          items={[
+            ...completedCourses,
+            ...coursesInProgress,
+            ...coursesNotStartedYet,
+          ]}
+        />
       </div>
     </div>
   );

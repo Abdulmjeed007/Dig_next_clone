@@ -1,10 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useDisclosure } from "@chakra-ui/react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/lib/store";
-import { onClose, onOpen } from "@/lib/trigger";
+import { onOpen } from "@/lib/trigger";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import { data } from "@/lib/page";
@@ -15,45 +14,50 @@ export const DialogBox = ({ page }: { page?: string }) => {
   const [showAgain, setShowAgain] = useState(false);
   const { user } = useUser();
 
-  console.log(user);
+  const getStatus = useCallback(async () => {
+    try {
+      const { data } = await axios.get(`/api/dialog`);
+      setPopup(data && data[page!] !== undefined ? !data[page!] : true);
+    } catch (e) {
+      console.error("Error fetching dialog status:", e);
+      setPopup(true);
+    }
+  }, [page]);
 
   useEffect(() => {
-    async function getStatus() {
-      try {
-        const { data } = await axios.get(`/api/dialog`);
-        if (data) {
-          console.log(data);
-          setPopup(!data[page!]);
-        } else {
-          setPopup(true);
-        }
-      } catch (e) {}
-    }
     getStatus();
-  }, []);
+  }, [getStatus]);
 
   const status = useSelector((state: RootState) => state.status.value);
   const dispatch = useDispatch();
-  const router = useRouter();
-  const handleClick = async (open: boolean) => {
-    try {
-      let object: any = {};
-      object[page!] = true;
-      if (open) {
-        dispatch(onOpen());
-      }
-      setPopup(false);
 
-      if (showAgain) {
-        const { data } = await axios.post(`/api/dialog`, { object });
-        if (data) {
-          console.log(data);
-        } else {
+  const handleClick = useCallback(
+    async (open: boolean) => {
+      try {
+        if (open) {
+          dispatch(onOpen());
         }
+
+        setPopup(false);
+
+        if (showAgain) {
+          const object = { [page!]: true };
+          const { data } = await axios.post(`/api/dialog`, { object });
+          if (data) {
+            console.log("Dialog status updated:", data);
+          }
+        }
+      } catch (e) {
+        console.error("Error updating dialog status:", e);
       }
-    } catch (e) {}
-  };
-  const [check, setCheck] = useState<any>();
+    },
+    [dispatch, showAgain, page]
+  );
+
+  const userFullName = useMemo(() => {
+    return `${user?.firstName} ${user?.lastName || ""}`.trim();
+  }, [user?.firstName, user?.lastName]);
+
   return (
     <div>
       {popup && !status && (
@@ -107,10 +111,7 @@ export const DialogBox = ({ page }: { page?: string }) => {
                     className="text-base leading-relaxed text-gray-700 dark:text-gray-400"
                     dir="rtl"
                   >
-                    مرحبا بك{" "}
-                    {`${user?.firstName} ${
-                      user?.lastName ? user?.lastName : ""
-                    }`}
+                    مرحبا بك {userFullName}
                   </p>
                   <p className="text-base leading-relaxed text-gray-700 dark:text-gray-400">
                     {data[page!]}

@@ -24,30 +24,27 @@ export const getCourses = async ({
     const courses = await db.course.findMany({
       where: {
         isPublished: true,
-        AND: [
-          {
-            chapters: {
-              some: {
-                isPublished: true,
-                AND: {
-                  lessons: {
-                    some: {
-                      isPublished: true,
-                    },
-                  },
-                },
-              },
-            },
-          },
-        ],
         title: {
           contains: title,
         },
         categoryId,
+        chapters: {
+          some: {
+            isPublished: true,
+            lessons: {
+              some: {
+                isPublished: true,
+              },
+            },
+          },
+        },
       },
       include: {
         exams: {
-          
+          select: {
+            beforeScore: true,
+          },
+          take: 1,
         },
         category: true,
         chapters: {
@@ -63,31 +60,28 @@ export const getCourses = async ({
         createdAt: "desc",
       },
     });
-    const coursesWithProgress: CourseWithProgressWithCategory[] =
-      await Promise.all(
-        courses.map(async (course) => {
-          let courseProgressPercentage = await getProgress(userId, course.id);
-          
-          // const courseProgressPercentage =
-          //   chapterProgressPercentage.reduce((acc, progress) => acc + progress, 0) /
-          //   chapterProgressPercentage.length;
 
-          if (
-            course.exams[0]?.beforeScore &&
-            course.exams[0]?.beforeScore >= 50 &&
-            courseProgressPercentage < 100
-          ) {
-            courseProgressPercentage = Math.min(
-              courseProgressPercentage,
-              100
-            );
-          }
-          return {
-            ...course,
-            progress: courseProgressPercentage,
-          };
-        })
-      );
+    const progressPromises = courses.map((course) =>
+      getProgress(userId, course.id)
+    );
+    const progressResults = await Promise.all(progressPromises);
+
+    const coursesWithProgress: CourseWithProgressWithCategory[] = courses.map(
+      (course, index) => {
+        let courseProgressPercentage = progressResults[index];
+        if (
+          course.exams[0]?.beforeScore &&
+          course.exams[0].beforeScore >= 50 &&
+          courseProgressPercentage < 100
+        ) {
+          courseProgressPercentage = Math.min(courseProgressPercentage, 100);
+        }
+        return {
+          ...course,
+          progress: courseProgressPercentage,
+        };
+      }
+    );
 
     return coursesWithProgress;
   } catch (error) {
