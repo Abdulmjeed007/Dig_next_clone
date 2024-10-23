@@ -1,8 +1,8 @@
 "use client";
 
-import { BookIcon, CheckCircle, PlayCircle,LockIcon } from "lucide-react";
+import { BookIcon, CheckCircle, PlayCircle } from "lucide-react";
 import { redirect, usePathname, useRouter } from "next/navigation";
-
+import LockIconWrapper from "./LockIconWrapper";
 import { useAuth } from "@clerk/nextjs";
 
 import { cn } from "@/lib/utils";
@@ -159,8 +159,7 @@ export const CourseSidebarItem = ({
                         pathname?.includes(lesson.id) && "text-sky-700"
                       )}
                     />
-                  ) : lesson.lock == true ? (<LockIcon
-                    size={22}
+                  ) : lesson.lock == true ? ( <LockIconWrapper
                     className={cn(
                       "text-slate-500",
                       pathname?.includes(lesson.id) && "text-slate-700"
@@ -195,7 +194,7 @@ export const CourseSidebarItem = ({
                 )}
               >
                 <div className="flex items-center justify-between text-right w-full gap-x-2 py-4">
-                  {quiz.lock ? <LockIcon size={22} className={cn("text-yellow-600 hover:text-yellow-700")} /> : hasTakenQuiz ? (
+                  {quiz.lock ? <LockIconWrapper className="text-yellow-600 hover:text-yellow-700" /> : hasTakenQuiz ? (
                     <CheckCircle size={22} className={cn("text-sky-500")} />
                   ) : (
                     <PlayCircle
