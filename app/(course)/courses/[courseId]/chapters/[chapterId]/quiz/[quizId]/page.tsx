@@ -22,6 +22,7 @@ import { useConfettiStore } from "@/hooks/use-confetti-store";
 import { Banner } from "@/components/banner";
 import Link from "next/link";
 import FroalaEditorView from "react-froala-wysiwyg/FroalaEditorView";
+import { Check } from "lucide-react";
 
 type QuizWithQuestionsAndOptions = Prisma.QuizGetPayload<{
   include: {
@@ -83,7 +84,7 @@ const ExamIdPage = ({
       const { data } = await axios.get(
         `/api/courses/${params.courseId}/chapters/${params.chapterId}/quiz/${params.quizId}/progress`
       );
-      console.log(data);
+
       if (data) {
         setUserSelections(JSON.parse(data.options));
         setDisableSelect(true);
@@ -113,11 +114,7 @@ const ExamIdPage = ({
         }
       );
 
-      console.log("====================================");
-      console.log("====================================");
-
       if (points != undefined) {
-        console.log(userSelections);
         const quizResponse = await axios.put(
           `/api/courses/${params.courseId}/chapters/${params.chapterId}/quiz/${quiz.id}/progress`,
           {
@@ -125,9 +122,6 @@ const ExamIdPage = ({
             userSelections,
           }
         );
-
-        console.log("====================================");
-        console.log("====================================");
 
         sethasSubmitted(true);
         if (points > 50) {
@@ -147,10 +141,6 @@ const ExamIdPage = ({
 
       router.refresh();
     } catch (error) {
-      console.log("====================================");
-      console.log(error);
-      console.log("====================================");
-
       toast.error("هناك خطأ ما");
     } finally {
       setIsSubmitting(false);
@@ -229,13 +219,7 @@ const ExamIdPage = ({
 
         setQuiz(chapterResponse.data.quiz);
         setCourse(courseResponse.data);
-
-        console.log("====================================");
-        console.log("====================================");
       } catch (error) {
-        console.log("====================================");
-        console.log(error);
-        console.log("====================================");
         toast.error("هناك شئ غير صحيح");
       }
     }
@@ -273,9 +257,9 @@ const ExamIdPage = ({
                 </h1>
               </div>
               <div className="flex space-x-3 ">
-                <div className="text-md">
+                {/* <div className="text-md">
                   {canSubmit} أسئلة تمت الإجابة عليها {answeredQuestions}
-                </div>
+                </div> */}
               </div>
             </div>
           )}
@@ -301,25 +285,33 @@ const ExamIdPage = ({
                         <div key={option.id}>
                           {hasSubmitted ? (
                             <div
-                              className={`flex space-x-2 ${
+                              className={`flex space-x-2 flex-row-reverse justify-between ${
                                 index + 1 == parseInt(question.answer)
-                                  ? "text-sky-600"
+                                  ? "bg-green-400 min-w-[500px] border border-green-500 rounded-md"
                                   : "text-red-500"
                               }`}
                             >
-                              <label className="capitalize text-sm">
-                                {option.text}
-                              </label>
-                              <input
-                                className="mr-2"
-                                type="radio"
-                                name={question.id}
-                                disabled={disableSelect}
-                                value={index + 1}
-                                onChange={() =>
-                                  handleOptionChange(question.id, index)
-                                }
-                              />
+                              <div className="flex gap-2">
+                                <label className="capitalize text-sm">
+                                  {option.text}
+                                </label>
+                                <input
+                                  className="mr-2"
+                                  type="radio"
+                                  name={question.id}
+                                  disabled={disableSelect}
+                                  checked={
+                                    userSelections?.[question?.id] == index
+                                  }
+                                  value={index + 1}
+                                  onChange={() =>
+                                    handleOptionChange(question.id, index)
+                                  }
+                                />
+                              </div>
+                              {index + 1 == parseInt(question.answer) && (
+                                <Check className="text-green-200" />
+                              )}
                             </div>
                           ) : (
                             <div className="flex space-x-2">
@@ -397,7 +389,7 @@ const ExamIdPage = ({
                       "bg-sky-600 mb-6 text-white w-fit font-bold text-sm px-4 py-2 rounded-md"
                     )}
                   >
-                    اعادة الاختبار
+                    إعادة النشاط
                   </button>
                 ) : (
                   ""

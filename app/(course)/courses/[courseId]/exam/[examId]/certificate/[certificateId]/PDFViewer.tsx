@@ -17,21 +17,18 @@ import "react-pdf/dist/Page/TextLayer.css";
 
 pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js`;
 
-const CertificatePage = ({
+export const PdfViewer = ({
   params,
 }: {
   params: { courseId: string; examId: string; certificateId: string };
 }) => {
   const htmlRef = useRef<HTMLDivElement>(null);
-  pdfjs.GlobalWorkerOptions.workerSrc = new URL(
-    "pdfjs-dist/build/pdf.worker.min.mjs",
-    import.meta.url
-  ).toString();
   const [certificatePdf, setCertificatePdf] = useState<string>("");
   const { userId } = useAuth();
   const router = useRouter();
   const [certificate, setCertificate] = useState<Certificate>();
 
+  alert();
   const [isGettingCertificate, setisGettingCertificate] = useState(false);
 
   useEffect(() => {
@@ -45,7 +42,6 @@ const CertificatePage = ({
       const pdfDoc = await PDFDocument.load(existingPdfBytes);
       const pages = pdfDoc.getPages();
       const firstPage = pages[0];
-      console.log(existingPdfBytes);
 
       try {
         const response = await axios.get(
@@ -87,20 +83,14 @@ const CertificatePage = ({
 
         var b64encoded = Buffer.from(pdfBytes).toString("base64");
         setCertificatePdf(`data:application/pdf;base64,` + b64encoded);
-        console.log(response.data);
+
         setCertificate(response.data);
 
         if (!response.data) {
           redirect(`/courses/${params.courseId}`);
         }
         return router.refresh();
-
-        console.log("====================================");
-        console.log("====================================");
       } catch (error) {
-        console.log("====================================");
-        console.log(error);
-        console.log("====================================");
         toast.error("هناك شئ غير صحيح");
       } finally {
         setisGettingCertificate(false);
@@ -162,5 +152,3 @@ const CertificatePage = ({
     </>
   );
 };
-
-export default CertificatePage;

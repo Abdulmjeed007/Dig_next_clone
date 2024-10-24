@@ -339,7 +339,7 @@ const ExamIdPage = ({
                 <p>مجموع الاسئلة: {exam?.questions.length}</p>
                 <p>عدد الأسئلة الصحيحة: {correctAnswers}</p>
                 <p>عدد الأسئلة الخاطئة: {wrongAnswers}</p>
-                <p>النسبة المئوية: {scorePercentage.toFixed(1)} %</p>
+                <p>النسبة المئوية: % {scorePercentage.toFixed(1)} </p>
               </div>
               <button
                 type="button"
