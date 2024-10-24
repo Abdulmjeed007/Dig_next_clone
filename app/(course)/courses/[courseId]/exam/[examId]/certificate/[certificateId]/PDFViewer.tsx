@@ -2,20 +2,16 @@
 
 import { useEffect, useRef, useState } from "react";
 import { htmlToPdf } from "@/lib/html-to-pdf";
-import Image from "next/image";
 import toast from "react-hot-toast";
 import { useAuth } from "@clerk/nextjs";
 import { redirect, useRouter } from "next/navigation";
 import axios from "axios";
 import { Certificate } from "@prisma/client";
-import { degrees, PDFDocument, rgb, StandardFonts } from "pdf-lib";
-import { Document, Page, pdfjs } from "react-pdf";
+import { PDFDocument, rgb } from "pdf-lib";
 import fontkit from "@pdf-lib/fontkit";
 
-// Text layer for React-PDF.
 import "react-pdf/dist/Page/TextLayer.css";
-
-pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js`;
+import PDF from "./Viewer";
 
 export const PdfViewer = ({
   params,
@@ -28,7 +24,6 @@ export const PdfViewer = ({
   const router = useRouter();
   const [certificate, setCertificate] = useState<Certificate>();
 
-  alert();
   const [isGettingCertificate, setisGettingCertificate] = useState(false);
 
   useEffect(() => {
@@ -53,7 +48,7 @@ export const PdfViewer = ({
         const fontBytes = await fetch(fontUrl).then((res) => res.arrayBuffer());
         const customFont = await pdfDoc.embedFont(fontBytes);
         const textSize = 35;
-        const date = new Date(response.data.createdAt);
+        const date = new Date(response.data.dateOfIssuance);
         firstPage.drawText(response.data.nameOfStudent, {
           x: 400,
           y: 285,
@@ -71,7 +66,7 @@ export const PdfViewer = ({
         firstPage.drawText(
           `${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate()}`,
           {
-            x: 150,
+            x: 100,
             y: 72,
             size: 20,
             font: customFont,
@@ -81,8 +76,11 @@ export const PdfViewer = ({
 
         const pdfBytes = await pdfDoc.save();
 
-        var b64encoded = Buffer.from(pdfBytes).toString("base64");
-        setCertificatePdf(`data:application/pdf;base64,` + b64encoded);
+        const pdfBlob = new Blob([pdfBytes], { type: "application/pdf" });
+
+        const pdfUrl = URL.createObjectURL(pdfBlob);
+
+        setCertificatePdf(pdfUrl);
 
         setCertificate(response.data);
 
@@ -117,7 +115,6 @@ export const PdfViewer = ({
       link.click();
     } catch (error) {
       console.error(error);
-      // Handle download failure gracefully
     }
   };
 
@@ -137,18 +134,11 @@ export const PdfViewer = ({
           >
             <div> تحميل PDF</div>
           </button>
-
-          <div
-            ref={htmlRef}
-            id="certificate"
-            className="w-full overflow-hidden h-[700px] shadow-lg flex flex-row-reverse text-right"
-          >
-            <Document file={certificatePdf}>
-              <Page height={400} width={1000} pageNumber={1} />
-            </Document>
-          </div>
+          <PDF fileUrl={certificatePdf} />
         </div>
       ) : null}
     </>
   );
 };
+
+export default PdfViewer;
