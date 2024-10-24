@@ -57,9 +57,9 @@ const CertificatePage = ({
         const fontBytes = await fetch(fontUrl).then((res) => res.arrayBuffer());
         const customFont = await pdfDoc.embedFont(fontBytes);
         const textSize = 35;
-        const date = new Date(response.data.createdAt);
+        const date = new Date(response.data.dateOfIssuance);
         firstPage.drawText(response.data.nameOfStudent, {
-          x: 400,
+          x: 380,
           y: 285,
           size: textSize,
           font: customFont,
@@ -75,7 +75,7 @@ const CertificatePage = ({
         firstPage.drawText(
           `${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate()}`,
           {
-            x: 150,
+            x: 110,
             y: 72,
             size: 20,
             font: customFont,
