@@ -286,9 +286,8 @@ const ExamIdPage = ({
                           {hasSubmitted ? (
                             <div
                               className={`flex space-x-2 flex-row-reverse justify-between ${
-                                index + 1 == parseInt(question.answer)
-                                  ? "bg-[#0177a9] min-w-[500px] rounded-md"
-                                  : "text-red-500"
+                                index + 1 == parseInt(question.answer) &&
+                                "bg-[#0177a9] min-w-[500px] rounded-md"
                               }`}
                             >
                               <div className="flex gap-2">
