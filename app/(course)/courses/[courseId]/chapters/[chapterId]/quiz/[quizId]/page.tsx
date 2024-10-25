@@ -300,10 +300,6 @@ const ExamIdPage = ({
                                   type="radio"
                                   name={question.id}
                                   disabled={disableSelect}
-                                  checked={
-                                    userSelections?.[question?.id] == index
-                                  }
-                                  value={index + 1}
                                   onChange={() =>
                                     handleOptionChange(question.id, index)
                                   }
@@ -355,7 +351,7 @@ const ExamIdPage = ({
               </CarouselItem>
             ))}
 
-            <div className="flex flex-col justify-end items-end w-full space-y-3 mr-12 md:mr-20">
+            <div className="flex flex-col justify-end items-end w-full space-y-3 mr-8 md:mr-20">
               <div className="flex flex-row space-x-4 items-center">
                 {hasSubmitted ? (
                   <Link
