@@ -287,7 +287,7 @@ const ExamIdPage = ({
                             <div
                               className={`flex space-x-2 flex-row-reverse justify-between ${
                                 index + 1 == parseInt(question.answer)
-                                  ? "bg-green-400 min-w-[500px] border border-green-500 rounded-md"
+                                  ? "bg-[#0177a9] min-w-[500px] rounded-md"
                                   : "text-red-500"
                               }`}
                             >
